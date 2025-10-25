@@ -2,79 +2,255 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
 <style>
 :root {
-  --accent:#00ffc6;
-  --bg:#0d0d0d;
-  --text:#fff;
+  --accent: #00ffcc;
+  --bg: #0d0d0d;
+  --text: #ffffff;
+  --muted: #aaaaaa;
 }
+
+
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  font-family: "Poppins", sans-serif;
-  user-select: none;          
+  font-family: "Poppins", "Inter", "Segoe UI", sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  user-select: none;
+  -webkit-user-drag: none;
 }
+
+html {
+  font-size: 14px; 
+}
+
 body {
   background: var(--bg);
   color: var(--text);
   display: flex;
-  justify-content: center;
+  flex-direction: column;
   align-items: center;
+  justify-content: center;
   min-height: 100vh;
+  text-align: center;
   overflow: hidden;
 }
+
 .overlay {
   position: fixed;
   inset: 0;
-  background: radial-gradient(circle at center, rgba(0,255,198,.08), transparent 60%);
+  background: radial-gradient(circle at center, rgba(0,255,198,0.07), transparent 60%);
   z-index: -1;
 }
+
+h1 {
+  font-size: 0.85rem;
+  color: var(--accent);
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+}
+
+#localTimer {
+  font-size: 0.7rem;
+  color: var(--muted);
+  letter-spacing: 0.5px;
+  margin-bottom: 1.5rem;
+  font-weight: 400;
+}
+
 .video-wrapper {
-  width: 80%;
+  width: 90%;
   max-width: 900px;
   aspect-ratio: 16/9;
-  border: 1px solid rgba(0,255,198,.25);
+  border: 1px solid rgba(0,255,198,0.25);
   border-radius: 12px;
   overflow: hidden;
-  box-shadow: 0 0 20px rgba(0,255,198,.15);
-  pointer-events: none;       
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: opacity 1s ease;
+  opacity: 1;
+  pointer-events: none;
 }
+
+.video-wrapper.fade-in {
+  opacity: 0;
+  animation: fadeIn 1.5s ease forwards;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
 .video-wrapper iframe,
 .video-wrapper video {
   width: 100%;
   height: 100%;
   border: none;
   object-fit: cover;
-  pointer-events: none;       
+  pointer-events: none;
+}
+
+.placeholder {
+  font-size: 0.8rem;
+  color: #888;
+  padding: 0.5rem;
+  line-height: 1.3;
+  font-weight: 400;
+}
+
+.countdown {
+  color: var(--accent);
+  font-weight: 500;
+  margin-top: 0.4rem;
+  font-size: 0.8rem;
+  letter-spacing: 1px;
+  animation: glow 1.8s ease-in-out infinite;
+}
+
+@keyframes glow {
+  0%, 100% { opacity: 0.6; }
+  50% { opacity: 1; }
+}
+
+
+.loader {
+  margin-top: 0.6rem;
+  width: 28px;
+  height: 28px;
+  border: 2.5px solid rgba(0,255,198,0.15);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin 1.3s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+  margin-left: auto;
+  margin-right: auto;
+  will-change: transform;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+
+@media (max-width: 480px) {
+  html {
+    font-size: 12px; 
+  }
+  .placeholder {
+    font-size: 0.75rem;
+  }
+  .countdown {
+    font-size: 0.75rem;
+  }
+  h1 {
+    font-size: 0.8rem;
+  }
 }
 </style>
+
 </head>
-<body oncontextmenu="return false;" onkeydown="return false;" ondragstart="return false;">
+
+<body 
+  oncontextmenu="return false;"
+  onkeydown="return false;"
+  ondragstart="return false;"
+  onmousedown="return false;"
+  onselectstart="return false;"
+>
 <div class="overlay"></div>
-<div class="video-wrapper" id="videoContainer"></div>
+
+<h1>Diri ninyo makita ang mga naka-apil ug kinsa ang ni-daug.</h1>
+<div id="localTimer">Loading time...</div>
+
+<div class="video-wrapper" id="videoContainer">
+  <p class="placeholder">Initializing...</p>
+</div>
 
 <script>
-const videoLink = "";
 
-function createVideo(link){
+const videoLink = "https://youtu.be/vUB3zgnGPjA"; 
+const openDate = { year: 2025, month: 10, day: 26, hour: 19, minute: 30, second: 0 };
+const revealDelay = { hours: 0, minutes: 30, seconds: 0 };
+
+
+function getPhilippineTime() {
+  return new Date(new Date().toLocaleString("en-US", { timeZone: "Asia/Manila" }));
+}
+
+const openTimePH = new Date(openDate.year, openDate.month - 1, openDate.day, openDate.hour, openDate.minute, openDate.second);
+const revealDelayMs = ((revealDelay.hours * 3600) + (revealDelay.minutes * 60) + revealDelay.seconds) * 1000;
+const revealTimePH = new Date(openTimePH.getTime() - revealDelayMs);
+
+let hasShown = false;
+
+
+function formatTime(ms) {
+  if (ms <= 0) return "00d 00:00:00";
+  const d = String(Math.floor(ms / 86400000)).padStart(2, '0');
+  const h = String(Math.floor((ms % 86400000) / 3600000)).padStart(2, '0');
+  const m = String(Math.floor((ms % 3600000) / 60000)).padStart(2, '0');
+  const s = String(Math.floor((ms % 60000) / 1000)).padStart(2, '0');
+  return `${d}d ${h}:${m}:${s}`;
+}
+
+function updateTimer() {
+  const timer = document.getElementById("localTimer");
+  const nowPH = getPhilippineTime();
+  timer.textContent = nowPH.toLocaleString("en-PH", { timeZone: "Asia/Manila" });
+  checkSchedule(nowPH);
+}
+
+function showCountdown(msg, timeLeft) {
   const wrap = document.getElementById("videoContainer");
-  if(link.includes("youtube.com") || link.includes("youtu.be")){
+  wrap.classList.remove("fade-in");
+  wrap.innerHTML = `
+    <div>
+      <p class="placeholder">${msg}</p>
+      <div class="countdown">${formatTime(timeLeft)}</div>
+      <div class="loader"></div>
+    </div>
+  `;
+}
+
+function createVideo(link) {
+  const container = document.getElementById("videoContainer");
+  container.classList.add("fade-in");
+
+  if (link.includes("youtube.com") || link.includes("youtu.be")) {
     const id = link.split("v=")[1]?.split("&")[0] || link.split("/").pop();
-    wrap.innerHTML = `
+    container.innerHTML = `
       <iframe 
-        src="https://www.youtube.com/embed/${id}?autoplay=1&mute=1&controls=0&showinfo=0&rel=0&modestbranding=1&loop=1&playlist=${id}"
+        src="https://www.youtube.com/embed/${id}?autoplay=1&mute=1&controls=0&rel=0&modestbranding=1&playsinline=1&loop=1&playlist=${id}"
         allow="autoplay; fullscreen"
         allowfullscreen
       ></iframe>`;
-  } else if(link.endsWith(".mp4") || link.includes(".mp4")){
-    wrap.innerHTML = `<video src="${link}" autoplay muted loop playsinline></video>`;
+  } else if (link.endsWith(".mp4")) {
+    container.innerHTML = `
+      <video src="${link}" autoplay playsinline muted loop disablePictureInPicture controlslist="nodownload noplaybackrate nofullscreen" style="pointer-events:none;"></video>`;
   } else {
-    wrap.innerHTML = `<iframe src="${link}" allow="autoplay; fullscreen"></iframe>`;
+    container.innerHTML = `<p class="placeholder">Invalid video link.</p>`;
   }
 }
-createVideo(videoLink);
+
+function checkSchedule(nowPH) {
+  if (nowPH < revealTimePH) {
+    const diff = revealTimePH - nowPH;
+    showCountdown("Result will be revealed in:", diff);
+  } else if (nowPH >= revealTimePH && nowPH < openTimePH) {
+    const diff = openTimePH - nowPH;
+    showCountdown("Update in progress", diff);
+  } else if (nowPH >= openTimePH && !hasShown) {
+    hasShown = true;
+    createVideo(videoLink);
+  }
+}
+
+setInterval(updateTimer, 1000);
+updateTimer();
 </script>
 </body>
 </html>
