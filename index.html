@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<style>
+:root {
+  --accent:#00ffc6;
+  --bg:#0d0d0d;
+  --text:#fff;
+}
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Poppins", sans-serif;
+  user-select: none;          
+}
+body {
+  background: var(--bg);
+  color: var(--text);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  overflow: hidden;
+}
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(circle at center, rgba(0,255,198,.08), transparent 60%);
+  z-index: -1;
+}
+.video-wrapper {
+  width: 80%;
+  max-width: 900px;
+  aspect-ratio: 16/9;
+  border: 1px solid rgba(0,255,198,.25);
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 0 20px rgba(0,255,198,.15);
+  pointer-events: none;       
+}
+.video-wrapper iframe,
+.video-wrapper video {
+  width: 100%;
+  height: 100%;
+  border: none;
+  object-fit: cover;
+  pointer-events: none;       
+}
+</style>
+</head>
+<body oncontextmenu="return false;" onkeydown="return false;" ondragstart="return false;">
+<div class="overlay"></div>
+<div class="video-wrapper" id="videoContainer"></div>
+
+<script>
+const videoLink = "https://youtu.be/vUB3zgnGPjA";
+
+function createVideo(link){
+  const wrap = document.getElementById("videoContainer");
+  if(link.includes("youtube.com") || link.includes("youtu.be")){
+    const id = link.split("v=")[1]?.split("&")[0] || link.split("/").pop();
+    wrap.innerHTML = `
+      <iframe 
+        src="https://www.youtube.com/embed/${id}?autoplay=1&mute=1&controls=0&showinfo=0&rel=0&modestbranding=1&loop=1&playlist=${id}"
+        allow="autoplay; fullscreen"
+        allowfullscreen
+      ></iframe>`;
+  } else if(link.endsWith(".mp4") || link.includes(".mp4")){
+    wrap.innerHTML = `<video src="${link}" autoplay muted loop playsinline></video>`;
+  } else {
+    wrap.innerHTML = `<iframe src="${link}" allow="autoplay; fullscreen"></iframe>`;
+  }
+}
+createVideo(videoLink);
+</script>
+</body>
+</html>
