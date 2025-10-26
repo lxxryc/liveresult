@@ -232,7 +232,7 @@ function createVideo(link) {
     container.innerHTML = `
       <video src="${link}" autoplay playsinline muted loop disablePictureInPicture controlslist="nodownload noplaybackrate nofullscreen" style="pointer-events:none;"></video>`;
   } else {
-    container.innerHTML = `<p class="placeholder">Invalid video link.</p>`;
+    container.innerHTML = `<p class="placeholder">No submission received.</p>`;
   }
 }
 
