@@ -1,256 +1,674 @@
-<!DOCTYPE html>
+here<!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+
+<meta charset="UTF-8">
+
+<meta
+name="viewport"
+content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+
+<title>Untitled</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+
 <style>
-:root {
-  --accent: #00ffcc;
-  --bg: #0d0d0d;
-  --text: #ffffff;
-  --muted: #aaaaaa;
+
+:root{
+
+color-scheme:light dark;
+
+--bg:#f6f6f3;
+--card:#ffffff;
+--text:#202020;
+--muted:#757575;
+--line:rgba(0,0,0,.08);
+
 }
 
+@media(prefers-color-scheme:dark){
 
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-  font-family: "Poppins", "Inter", "Segoe UI", sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  user-select: none;
-  -webkit-user-drag: none;
+:root{
+
+--bg:#0d0d0d;
+--card:#171717;
+--text:#ececec;
+--muted:#9b9b9b;
+--line:rgba(255,255,255,.08);
+
 }
 
-html {
-  font-size: 18px; 
 }
 
-body {
-  background: var(--bg);
-  color: var(--text);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  min-height: 100vh;
-  text-align: center;
-  overflow: hidden;
+*{
+
+margin:0;
+padding:0;
+box-sizing:border-box;
+
 }
 
-.overlay {
-  position: fixed;
-  inset: 0;
-  background: radial-gradient(circle at center, rgba(0,255,198,0.07), transparent 60%);
-  z-index: -1;
+html,
+body{
+
+width:100%;
+height:100%;
+overflow:hidden;
+
+font-family:Inter,sans-serif;
+
+background:var(--bg);
+
+color:var(--text);
+
+-webkit-user-select:none;
+user-select:none;
+
 }
 
-h1 {
-  font-size: 1rem;
-  color: var(--accent);
-  margin-bottom: 0.5rem;
-  font-weight: 500;
+body{
+
+display:flex;
+
+justify-content:center;
+
+align-items:center;
+
+padding:18px;
+
+background:
+radial-gradient(circle at top,
+rgba(255,255,255,.06),
+transparent 55%),
+var(--bg);
+
 }
 
-#localTimer {
-  font-size: 0.7rem;
-  color: var(--muted);
-  letter-spacing: 0.5px;
-  margin-bottom: 1.5rem;
-  font-weight: 400;
+/* ------------------------------ */
+/* LOADER */
+/* ------------------------------ */
+
+#loader{
+
+position:fixed;
+
+inset:0;
+
+display:flex;
+
+justify-content:center;
+
+align-items:center;
+
+background:var(--bg);
+
+z-index:9999;
+
+transition:.6s;
+
 }
 
-.video-wrapper {
-  width: 90%;
-  max-width: 900px;
-  aspect-ratio: 16/9;
-  border: 1px solid rgba(0,255,198,0.25);
-  border-radius: 12px;
-  overflow: hidden;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  transition: opacity 1s ease;
-  opacity: 1;
-  pointer-events: none;
+.loader{
+
+width:34px;
+height:34px;
+
+border:2px solid rgba(120,120,120,.2);
+
+border-top-color:var(--text);
+
+border-radius:50%;
+
+animation:spin .8s linear infinite;
+
 }
 
-.video-wrapper.fade-in {
-  opacity: 0;
-  animation: fadeIn 1.5s ease forwards;
+@keyframes spin{
+
+to{
+
+transform:rotate(360deg);
+
 }
 
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
 }
 
-.video-wrapper iframe,
-.video-wrapper video {
-  width: 100%;
-  height: 100%;
-  border: none;
-  object-fit: cover;
-  pointer-events: none;
+#loader.hide{
+
+opacity:0;
+
+visibility:hidden;
+
 }
 
-.placeholder {
-  font-size: 0.8rem;
-  color: #888;
-  padding: 0.5rem;
-  line-height: 1.3;
-  font-weight: 400;
+/* ------------------------------ */
+/* COUNTDOWN */
+/* ------------------------------ */
+
+#countdown{
+
+position:fixed;
+
+inset:0;
+
+display:none;
+
+justify-content:center;
+
+align-items:center;
+
+flex-direction:column;
+
+background:var(--bg);
+
+z-index:5000;
+
+padding:30px;
+
+text-align:center;
+
 }
 
-.countdown {
-  color: var(--accent);
-  font-weight: 500;
-  margin-top: 0.4rem;
-  font-size: 0.8rem;
-  letter-spacing: 1px;
-  animation: glow 1.8s ease-in-out infinite;
+#countdown h1{
+
+font-size:clamp(2rem,8vw,4rem);
+
+font-weight:300;
+
+letter-spacing:.05em;
+
 }
 
-@keyframes glow {
-  0%, 100% { opacity: 0.6; }
-  50% { opacity: 1; }
+/* ------------------------------ */
+/* PAGE */
+/* ------------------------------ */
+
+#page{
+
+display:none;
+
+width:100%;
+
+height:100dvh;
+
+justify-content:center;
+
+align-items:center;
+
 }
 
+/* ------------------------------ */
+/* CARD */
+/* ------------------------------ */
 
-.loader {
-  margin-top: 0.6rem;
-  width: 28px;
-  height: 28px;
-  border: 2.5px solid rgba(0,255,198,0.15);
-  border-top-color: var(--accent);
-  border-radius: 50%;
-  animation: spin 1.3s cubic-bezier(0.4, 0, 0.2, 1) infinite;
-  margin-left: auto;
-  margin-right: auto;
-  will-change: transform;
+.card{
+
+width:min(860px,100%);
+
+height:min(760px,100%);
+
+background:var(--card);
+
+border:1px solid var(--line);
+
+border-radius:22px;
+
+display:flex;
+
+flex-direction:column;
+
+overflow:hidden;
+
+box-shadow:
+
+0 20px 60px rgba(0,0,0,.12);
+
 }
 
-@keyframes spin {
-  to { transform: rotate(360deg); }
+/* ------------------------------ */
+/* MESSAGE */
+/* ------------------------------ */
+
+.message{
+
+flex:1;
+
+overflow-y:auto;
+
+padding:
+
+clamp(26px,5vw,44px);
+
+scroll-behavior:smooth;
+
+overscroll-behavior:contain;
+
+scrollbar-width:thin;
+
+scrollbar-color:#777 transparent;
+
 }
 
+.message::-webkit-scrollbar{
 
-@media (max-width: 480px) {
-  html {
-    font-size: 12px; 
-  }
-  .placeholder {
-    font-size: 0.75rem;
-  }
-  .countdown {
-    font-size: 0.75rem;
-  }
-  h1 {
-    font-size: 0.8rem;
-  }
+width:5px;
+
 }
+
+.message::-webkit-scrollbar-thumb{
+
+background:#666;
+
+border-radius:999px;
+
+}
+
+.message::-webkit-scrollbar-track{
+
+background:transparent;
+
+}
+
+.message p{
+
+font-size:clamp(16px,.95rem + .15vw,18px);
+
+line-height:2;
+
+text-align:justify;
+
+margin-bottom:2rem;
+
+}
+
+.message blockquote{
+
+margin:3rem 0;
+
+padding-left:20px;
+
+border-left:3px solid var(--line);
+
+color:var(--muted);
+
+font-style:italic;
+
+line-height:1.9;
+
+}
+
+/* ------------------------------ */
+/* FIXED FOOTER */
+/* ------------------------------ */
+
+.footer{
+
+height:60px;
+
+flex-shrink:0;
+
+border-top:1px solid var(--line);
+
+display:flex;
+
+justify-content:space-between;
+
+align-items:center;
+
+padding:0 28px;
+
+font-size:.84rem;
+
+color:var(--muted);
+
+background:var(--card);
+
+}
+
+@media(max-width:768px){
+
+body{
+
+padding:10px;
+
+}
+
+.card{
+
+width:100%;
+
+height:100%;
+
+border-radius:16px;
+
+}
+
+.message{
+
+padding:28px;
+
+}
+
+.footer{
+
+padding:0 20px;
+
+font-size:.8rem;
+
+}
+
+}
+
+::selection{
+
+background:rgba(120,120,120,.25);
+
+}
+
 </style>
 
 </head>
 
-<body 
-  oncontextmenu="return false;"
-  onkeydown="return false;"
-  ondragstart="return false;"
-  onmousedown="return false;"
-  onselectstart="return false;"
->
-<div class="overlay"></div>
+<body>
 
-<h1>This page shows the participants and the winner.</h1>
-<div id="localTimer">Loading time...</div>
+<div id="loader">
 
-<div class="video-wrapper" id="videoContainer">
-  <p class="placeholder">Initializing...</p>
+<div class="loader"></div>
+
+</div>
+
+<div id="countdown">
+
+<h1>
+
+<span id="days"></span>d
+
+<span id="hours"></span>h
+
+<span id="minutes"></span>m
+
+<span id="seconds"></span>s
+
+</h1>
+
+</div>
+
+<div id="page">
+
+<div class="card">
+
+<div class="message">
+
+<p>
+
+If this message happens to find you,
+
+I hope life is kind to you.
+
+</p>
+
+<p>
+
+May you find success in whatever you choose to pursue,
+
+good health to enjoy the journey,
+
+and people who bring honesty,
+
+peace,
+
+and encouragement into your life.
+
+</p>
+
+<p>
+
+Life will bring both certainty and doubt.
+
+You won't always have all the answers,
+
+and that's okay.
+
+Some things only make sense later.
+
+</p>
+
+<p>
+
+Keep your focus on what matters most.
+
+Stay humble when things go well.
+
+Be grateful for the little things.
+
+Give without expecting anything in return.
+
+Choose what brings you peace,
+
+and don't let success change who you are.
+
+</p>
+
+<blockquote>
+
+Time is finite.
+
+Character matters.
+
+Everything else is perspective.
+
+</blockquote>
+
+  <p>
+
+Whatever path life takes you,
+
+remember that success and failure are both temporary.
+
+What remains is the person you become while moving through them.
+
+</p>
+
+<p>
+
+The world often rewards appearance before substance.
+
+Do not let that become your standard.
+
+A reputation can be created in a moment.
+
+Character is built over years.
+
+</p>
+
+<p>
+
+It is possible to be respected without seeking attention.
+
+It is possible to live quietly while still living meaningfully.
+
+Some of the most valuable things in life happen where no audience exists.
+
+</p>
+
+<p>
+
+Protect your peace.
+
+Not by avoiding responsibility,
+
+but by choosing carefully what deserves your attention.
+
+Attention is limited.
+
+Spend it wisely.
+
+</p>
+
+<p>
+
+Be patient with your own growth.
+
+Understanding often arrives after experience,
+
+not before it.
+
+</p>
+
+<p>
+
+There will always be things outside your control.
+
+Accept them.
+
+Spend your energy improving what is within your reach.
+
+</p>
+
+<p>
+
+If someday this page finds someone else,
+
+I hope these words encourage reflection rather than agreement.
+
+Truth should not depend on who speaks it.
+
+</p>
+
+<p>
+
+Thank you for taking the time to read.
+
+I sincerely wish you peace,
+
+good health,
+
+wisdom,
+
+and the courage to remain true to what is right,
+
+even when no one is watching.
+
+</p>
+
+</div>
+
+<div class="footer">
+
+<span id="lastUpdated">
+
+Last Updated · July 2026
+
+</span>
+
+<span>
+
+LEC
+
+</span>
+
+</div>
+
+</div>
+
 </div>
 
 <script>
 
-const videoLink = ""; 
-const openDate = { year: 2025, month: 10, day: 26, hour: 19, minute: 30, second: 0 };
-const revealDelay = { hours: 0, minutes: 01, seconds: 30 };
+document.addEventListener("copy",e=>e.preventDefault());
+document.addEventListener("cut",e=>e.preventDefault());
 
+const SETTINGS={
 
-function getPhilippineTime() {
-  return new Date(new Date().toLocaleString("en-US", { timeZone: "Asia/Manila" }));
+countdownEnabled:false,
+
+unlockDate:new Date(2026,7,19,0,0,0),
+
+minimumLoaderTime:500
+
+};
+
+const loader=document.getElementById("loader");
+
+const countdown=document.getElementById("countdown");
+
+const page=document.getElementById("page");
+
+const started=performance.now();
+
+function showPage(){
+
+countdown.style.display="none";
+
+page.style.display="flex";
+
 }
 
-const openTimePH = new Date(openDate.year, openDate.month - 1, openDate.day, openDate.hour, openDate.minute, openDate.second);
-const revealDelayMs = ((revealDelay.hours * 3600) + (revealDelay.minutes * 60) + revealDelay.seconds) * 1000;
-const revealTimePH = new Date(openTimePH.getTime() - revealDelayMs);
+function updateCountdown(){
 
-let hasShown = false;
+const now=new Date();
 
+const diff=SETTINGS.unlockDate-now;
 
-function formatTime(ms) {
-  if (ms <= 0) return "00d 00:00:00";
-  const d = String(Math.floor(ms / 86400000)).padStart(2, '0');
-  const h = String(Math.floor((ms % 86400000) / 3600000)).padStart(2, '0');
-  const m = String(Math.floor((ms % 3600000) / 60000)).padStart(2, '0');
-  const s = String(Math.floor((ms % 60000) / 1000)).padStart(2, '0');
-  return `${d}d ${h}:${m}:${s}`;
+if(diff<=0){
+
+showPage();
+
+return;
+
 }
 
-function updateTimer() {
-  const timer = document.getElementById("localTimer");
-  const nowPH = getPhilippineTime();
-  timer.textContent = nowPH.toLocaleString("en-PH", { timeZone: "Asia/Manila" });
-  checkSchedule(nowPH);
+const days=Math.floor(diff/86400000);
+
+const hours=Math.floor(diff%86400000/3600000);
+
+const minutes=Math.floor(diff%3600000/60000);
+
+const seconds=Math.floor(diff%60000/1000);
+
+days.textContent=days;
+
+document.getElementById("hours").textContent=String(hours).padStart(2,"0");
+
+document.getElementById("minutes").textContent=String(minutes).padStart(2,"0");
+
+document.getElementById("seconds").textContent=String(seconds).padStart(2,"0");
+
 }
 
-function showCountdown(msg, timeLeft) {
-  const wrap = document.getElementById("videoContainer");
-  wrap.classList.remove("fade-in");
-  wrap.innerHTML = `
-    <div>
-      <p class="placeholder">${msg}</p>
-      <div class="countdown">${formatTime(timeLeft)}</div>
-      <div class="loader"></div>
-    </div>
-  `;
+window.addEventListener("load",()=>{
+
+const elapsed=performance.now()-started;
+
+const wait=Math.max(SETTINGS.minimumLoaderTime-elapsed,0);
+
+setTimeout(()=>{
+
+loader.classList.add("hide");
+
+if(SETTINGS.countdownEnabled){
+
+countdown.style.display="flex";
+
+updateCountdown();
+
+setInterval(updateCountdown,1000);
+
+}else{
+
+showPage();
+
 }
 
-function createVideo(link) {
-  const container = document.getElementById("videoContainer");
-  container.classList.add("fade-in");
+},wait);
 
-  if (link.includes("youtube.com") || link.includes("youtu.be")) {
-    const id = link.split("v=")[1]?.split("&")[0] || link.split("/").pop();
-    container.innerHTML = `
-      <iframe 
-        src="https://www.youtube.com/embed/${id}?autoplay=1&mute=1&controls=0&rel=0&modestbranding=1&playsinline=1&loop=1&playlist=${id}"
-        allow="autoplay; fullscreen"
-        allowfullscreen
-      ></iframe>`;
-  } else if (link.endsWith(".mp4")) {
-    container.innerHTML = `
-      <video src="${link}" autoplay playsinline muted loop disablePictureInPicture controlslist="nodownload noplaybackrate nofullscreen" style="pointer-events:none;"></video>`;
-  } else {
-    container.innerHTML = `<p class="placeholder">No submission received.</p>`;
-  }
-}
+});
 
-function checkSchedule(nowPH) {
-  if (nowPH < revealTimePH) {
-    const diff = revealTimePH - nowPH;
-    showCountdown("Result will be revealed in:", diff);
-  } else if (nowPH >= revealTimePH && nowPH < openTimePH) {
-    const diff = openTimePH - nowPH;
-    showCountdown("Update in progress", diff);
-  } else if (nowPH >= openTimePH && !hasShown) {
-    hasShown = true;
-    createVideo(videoLink);
-  }
-}
-
-setInterval(updateTimer, 1000);
-updateTimer();
 </script>
+
 </body>
 </html>
